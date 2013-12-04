@@ -1,6 +1,8 @@
 microbe
 =======
 
+[![Build Status](https://travis-ci.org/jpgneves/microbe.png)](https://travis-ci.org/jpgneves/microbe)
+
 Yet another micro web-framework written in Go.
 
 Microbe provides a pluggable URL routing engine and wrappers for HTTP request
