@@ -16,8 +16,12 @@ func MakeRoutingHandler(router Router) *RoutingHandler {
 	return &RoutingHandler{router}
 }
 
-func (rh *RoutingHandler) SetRouter(r Router) {
-	rh.router = r
+func (rh *RoutingHandler) Router() *Router {
+	return &rh.router
+}
+
+func (rh *RoutingHandler) SetRouter(r *Router) {
+	rh.router = *r
 }
 
 func (rh *RoutingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
