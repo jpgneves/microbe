@@ -13,7 +13,6 @@ type Microbe interface {
 	AddRoute(route string, resource *resources.Resource)
 	RemoveRoute(route string)
 	SetRouter(router *routers.Router)
-	InitResource(resource *resources.Resource) *resources.Resource
 	doStart()
 }
 
@@ -56,8 +55,4 @@ func (m *MicrobeInstance) RemoveRoute(route string) {
 
 func (m *MicrobeInstance) SetRouter(router *routers.Router) {
 	m.routinghandler.SetRouter(router)
-}
-
-func (m *MicrobeInstance) InitResource(resource resources.Resource) resources.Resource {
-	return resource.Init(m.config)
 }
