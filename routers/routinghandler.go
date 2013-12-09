@@ -9,26 +9,27 @@ import (
 )
 
 type RoutingHandler struct {
-	router Router
+	router *Router
 }
 
-func MakeRoutingHandler(router Router) *RoutingHandler {
+func MakeRoutingHandler(router *Router) *RoutingHandler {
 	return &RoutingHandler{router}
 }
 
 func (rh *RoutingHandler) Router() *Router {
-	return &rh.router
+	return rh.router
 }
 
 func (rh *RoutingHandler) SetRouter(r *Router) {
-	rh.router = *r
+	rh.router = r
 }
 
 func (rh *RoutingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var response *requests.Response
 	if rh.router != nil {
 		path := r.URL.Path
-		match := rh.router.Route(path)
+		router := *rh.router
+		match := router.Route(path)
 		if resource, ok := match.value.(resources.Resource); ok {
 			req := &requests.Request{r, match.matches}
 			switch r.Method {

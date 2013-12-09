@@ -28,7 +28,15 @@ func Init(config_filename string) *MicrobeInstance {
 	if err != nil {
 		log.Fatal(err)
 	}
-	routingHandler := routers.MakeRoutingHandler(routergen())
+
+	var routingHandler *routers.RoutingHandler
+
+	if routergen != nil {
+		router := routergen()
+		routingHandler = routers.MakeRoutingHandler(&router)
+	} else {
+		routingHandler = routers.MakeRoutingHandler(nil)
+	}
 
 	return &MicrobeInstance{config, routingHandler}
 }
