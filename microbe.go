@@ -1,7 +1,6 @@
 package microbe
 
 import (
-	"errors"
 	"github.com/jpgneves/microbe/config"
 	"github.com/jpgneves/microbe/resources"
 	"github.com/jpgneves/microbe/routers"
@@ -14,6 +13,7 @@ type Microbe interface {
 	AddRoute(route string, resource *resources.Resource)
 	RemoveRoute(route string)
 	SetRouter(router *routers.Router)
+	InitResource(resource *resources.Resource) *resources.Resource
 	doStart()
 }
 
@@ -24,19 +24,8 @@ type MicrobeInstance struct {
 
 func Init(config_filename string) *MicrobeInstance {
 	config := config.ReadConfig(config_filename)
-	routergen, err := selectRouter(config.RouterType)
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	var routingHandler *routers.RoutingHandler
-
-	if routergen != nil {
-		router := routergen()
-		routingHandler = routers.MakeRoutingHandler(&router)
-	} else {
-		routingHandler = routers.MakeRoutingHandler(nil)
-	}
+	routingHandler := routers.MakeRoutingHandler(config)
 
 	return &MicrobeInstance{config, routingHandler}
 }
@@ -69,14 +58,6 @@ func (m *MicrobeInstance) SetRouter(router *routers.Router) {
 	m.routinghandler.SetRouter(router)
 }
 
-func selectRouter(routertype string) (router func() routers.Router, err error) {
-	switch routertype {
-	case "static":
-		return routers.NewStaticRouter, nil
-	case "matching":
-		return routers.NewMatchingRouter, nil
-	case "custom": // Use *only* if you want to manually specify a custom router
-		return nil, nil
-	}
-	return nil, errors.New("Unknown router type")
+func (m *MicrobeInstance) InitResource(resource resources.Resource) resources.Resource {
+	return resource.Init(m.config)
 }

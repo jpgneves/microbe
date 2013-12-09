@@ -1,7 +1,9 @@
 package routers
 
 import (
+	"errors"
 	"fmt"
+	"github.com/jpgneves/microbe/config"
 	"github.com/jpgneves/microbe/requests"
 	"github.com/jpgneves/microbe/resources"
 	"log"
@@ -12,8 +14,18 @@ type RoutingHandler struct {
 	router *Router
 }
 
-func MakeRoutingHandler(router *Router) *RoutingHandler {
-	return &RoutingHandler{router}
+func MakeRoutingHandler(config *config.Configuration) *RoutingHandler {
+	routergen, err := selectRouter(config.RouterType)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if routergen != nil {
+		router := routergen()
+		return &RoutingHandler{&router}
+	}
+
+	return &RoutingHandler{nil}
 }
 
 func (rh *RoutingHandler) Router() *Router {
@@ -74,4 +86,16 @@ func handleError(w http.ResponseWriter, r *http.Request, code int) {
 	log.Printf("%s %s - %v", r.Method, r.URL.Path, code)
 	w.WriteHeader(code)
 	fmt.Fprintf(w, http.StatusText(code))
+}
+
+func selectRouter(routertype string) (router func() Router, err error) {
+	switch routertype {
+	case "static":
+		return NewStaticRouter, nil
+	case "matching":
+		return NewMatchingRouter, nil
+	case "custom": // Use *only* if you want to manually specify a custom router
+		return nil, nil
+	}
+	return nil, errors.New("Unknown router type")
 }
