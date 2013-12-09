@@ -20,10 +20,10 @@ type HostPortPair struct {
 }
 
 type Configuration struct {
-	ListenAddr  *HostPortPair
-	Storage     *StorageConfiguration
-	WwwRoot     *string
-	RouterType  string
+	ListenAddr *HostPortPair
+	Storage    *StorageConfiguration
+	WwwRoot    *string
+	RouterType string
 }
 
 func ReadConfig(filename string) *Configuration {
