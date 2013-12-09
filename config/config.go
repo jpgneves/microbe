@@ -8,12 +8,6 @@ import (
 	"strconv"
 )
 
-type StorageConfiguration struct {
-	Backend  *string
-	Location *string
-	Port     int
-}
-
 type HostPortPair struct {
 	Address *string
 	Port    int
@@ -21,7 +15,6 @@ type HostPortPair struct {
 
 type Configuration struct {
 	ListenAddr *HostPortPair
-	Storage    *StorageConfiguration
 	WwwRoot    *string
 	RouterType string
 }
