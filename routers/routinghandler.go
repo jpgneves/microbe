@@ -42,13 +42,33 @@ func (rh *RoutingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		path := r.URL.Path
 		router := *rh.router
 		match := router.Route(path)
-		if resource, ok := match.value.(resources.Resource); ok {
-			req := &requests.Request{r, match.matches}
+		req := &requests.Request{r, match.matches}
+		if _, ok := match.value.(resources.Resource); ok {
 			switch r.Method {
 			case "GET":
-				response = resource.Get(req)
+				if handler, ok := match.value.(resources.GetMethodHandler); ok {
+					response = handler.Get(req)
+				} else {
+					handleError(w, r, http.StatusMethodNotAllowed)
+				}
 			case "POST":
-				response = resource.Post(req)
+				if handler, ok := match.value.(resources.PostMethodHandler); ok {
+					response = handler.Post(req)
+				} else {
+					handleError(w, r, http.StatusMethodNotAllowed)
+				}
+			case "PUT":
+				if handler, ok := match.value.(resources.PutMethodHandler); ok {
+					response = handler.Put(req)
+				} else {
+					handleError(w, r, http.StatusMethodNotAllowed)
+				}
+			case "DELETE":
+				if handler, ok := match.value.(resources.DeleteMethodHandler); ok {
+					response = handler.Delete(req)
+				} else {
+					handleError(w, r, http.StatusMethodNotAllowed)
+				}
 			default:
 				handleError(w, r, http.StatusMethodNotAllowed)
 				return
