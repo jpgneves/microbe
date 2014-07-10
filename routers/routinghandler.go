@@ -73,7 +73,9 @@ func (rh *RoutingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				handleError(w, r, http.StatusMethodNotAllowed)
 				return
 			}
-			handleResponse(w, r, response)
+			if response != nil {
+				handleResponse(w, r, response)
+			}
 		} else {
 			handleError(w, r, http.StatusNotFound)
 		}
@@ -85,6 +87,11 @@ func (rh *RoutingHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func handleResponse(w http.ResponseWriter, r *http.Request, response *requests.Response) {
 	log.Printf("%s %s - %v", r.Method, r.URL.Path, response.StatusCode)
+	for k, vs := range response.Header {
+		for _, v := range vs {
+			w.Header().Add(k, v)
+		}
+	}
 	switch response.StatusCode {
 	case http.StatusTemporaryRedirect:
 		fallthrough
